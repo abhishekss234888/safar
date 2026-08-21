@@ -453,17 +453,7 @@
   // ============================================================
   // 🔥 FIREBASE — ADD / CONFIRM YOUR CREDENTIALS HERE
   // ============================================================
-  // This is the SAME Firebase project already wired up in index.html
-  // (project "safar-859"). If that's not the project you want to use
-  // for login, just replace the values below with your own project's
-  // config from Firebase Console → Project settings → Your apps.
-  //
-  // IMPORTANT: for this login form to actually authenticate anyone,
-  // go to Firebase Console → Build → Authentication → Sign-in method,
-  // and enable "Email/Password". Then add users under the "Users" tab
-  // (or wire up a sign-up flow later). The "Username" field below is
-  // sent to Firebase as the email address, so use full emails as
-  // usernames (e.g. driver@safar.app) when creating accounts.
+ (e.g. driver@safar.app) when creating accounts.
   // ============================================================
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
   import {
@@ -490,7 +480,7 @@
 
   // If someone already has a live session, skip straight to the app.
   onAuthStateChanged(auth, (user) => {
-    if (user) window.location.replace('index.html');
+    if (user) window.location.replace('dashboard.html');
   });
 
   // ---------------- password visibility toggle (unchanged) ----------------
