@@ -562,7 +562,7 @@
       await setPersistence(auth, browserLocalPersistence);
       await signInWithEmailAndPassword(auth, email, password);
       btn.innerHTML = 'Success — redirecting…';
-      window.location.replace('index.html');
+      window.location.replace('dashboard.html');
     } catch (err) {
       showError(friendlyError(err.code));
       btn.disabled = false;
