@@ -1127,7 +1127,7 @@
         const state = {
             latitude: 0,
             longitude: 0,
-            speedMph: 0,
+            speedkph: 0,
         };
 
         // ============================================================
@@ -1256,7 +1256,7 @@
         // ============================================================
 
         // 1. BUS LOCATION
-        const locationRef = ref(db, 'bus/currentLocation');
+        const locationRef = ref(db, 'SmartSchoolBus/GPS/lat');
         onValue(locationRef, (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
@@ -1278,7 +1278,7 @@
         });
 
         // 2. BUS SPEED
-        const speedRef = ref(db, 'bus/speed');
+        const speedRef = ref(db, 'SmartSchoolBus/GPS/speed');
         onValue(speedRef, (snapshot) => {
             const speed = snapshot.val();
             if (speed !== null && speed !== undefined) {
