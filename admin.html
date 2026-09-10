@@ -7,6 +7,23 @@
   <body>
       <h1 class="title">Hello World!</h1>
       <p id="currentTime"></p>
+    const ADMIN_EMAIL = "admin@safar.com";
+function isAdmin(user) {
+  return !!user?.email &&
+         user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    authGateText.textContent = 'Redirecting to login…';
+    window.location.replace('index.html');
+  } else if (!isAdmin(user)) {
+    authGateText.textContent = 'Access denied — redirecting…';
+    window.location.replace('dashboard.html');
+  } else {
+    document.body.classList.add('authed');
+  }
+});
       <script src="script.js"></script>
   </body>
 </html>
