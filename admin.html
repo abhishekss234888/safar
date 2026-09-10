@@ -7,7 +7,8 @@
   <body>
       <h1 class="title">Hello World!</h1>
       <p id="currentTime"></p>
-    const ADMIN_EMAIL = "admin@safar.com";
+      <script 
+        const ADMIN_EMAIL = "admin@safar.com";
 function isAdmin(user) {
   return !!user?.email &&
          user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -24,6 +25,6 @@ onAuthStateChanged(auth, (user) => {
     document.body.classList.add('authed');
   }
 });
-      <script src="script.js"></script>
+        src="script.js"></script>
   </body>
 </html>
