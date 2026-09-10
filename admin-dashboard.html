@@ -1460,7 +1460,7 @@
 
         <!-- SAFETY METRICS -->
         <section class="metrics-section" aria-label="School bus safety metrics">
-            <div class="metrics-heading">Live Safety Metrics</div>
+            <div class="metrics-heading">Live Data</div>
 
             <div class="metrics-grid">
                 <article class="metric-card" id="speedCard">
@@ -1469,8 +1469,7 @@
                         <div class="metric-label">Speed</div>
                     </div>
                     <div class="metric-value"><span id="speedValue">0</span> km/h</div>
-                    <div class="metric-note">Firebase: SmartSchoolBus/GPS/speed</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="alcoholCard">
                     <div class="metric-top">
@@ -1478,8 +1477,7 @@
                         <div class="metric-label">Alcohol</div>
                     </div>
                     <div class="metric-value" id="alcoholValue">NORMAL</div>
-                    <div class="metric-note">Firebase: SmartSchoolBus/Sensors/MQ3_Status</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="smokeCard">
                     <div class="metric-top">
@@ -1487,8 +1485,7 @@
                         <div class="metric-label">Smoke / Gas</div>
                     </div>
                     <div class="metric-value" id="smokeValue">NORMAL</div>
-                    <div class="metric-note">Firebase: SmartSchoolBus/Sensors/MQ2_Status</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="studentCard">
                     <div class="metric-top">
@@ -1496,8 +1493,7 @@
                         <div class="metric-label">Students</div>
                     </div>
                     <div class="metric-value" id="studentValue">N/A</div>
-                    <div class="metric-note">Not produced by current ESP32 code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="standingCard">
                     <div class="metric-top">
@@ -1505,8 +1501,7 @@
                         <div class="metric-label">Students Standing</div>
                     </div>
                     <div class="metric-value" id="standingValue">N/A</div>
-                    <div class="metric-note">No standing/occupancy field in current code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="brakeCard">
                     <div class="metric-top">
@@ -1514,8 +1509,7 @@
                         <div class="metric-label">Harsh Brake</div>
                     </div>
                     <div class="metric-value" id="brakeValue">N/A</div>
-                    <div class="metric-note">No accelerometer/brake field in current code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="turnCard">
                     <div class="metric-top">
@@ -1523,8 +1517,7 @@
                         <div class="metric-label">Sharp Turn</div>
                     </div>
                     <div class="metric-value" id="turnValue">N/A</div>
-                    <div class="metric-note">No IMU/turn field in current code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="focusCard">
                     <div class="metric-top">
@@ -1532,8 +1525,7 @@
                         <div class="metric-label">Driver Focus</div>
                     </div>
                     <div class="metric-value" id="focusValue">N/A</div>
-                    <div class="metric-note">No driver-monitoring field in current code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card" id="phoneCard">
                     <div class="metric-top">
@@ -1541,24 +1533,15 @@
                         <div class="metric-label">Phone Usage</div>
                     </div>
                     <div class="metric-value" id="phoneValue">N/A</div>
-                    <div class="metric-note">No phone-detection field in current code</div>
-                </article>
+                    </article>
 
                 <article class="metric-card available" id="attendanceCard">
                     <div class="metric-top">
                         <div class="metric-icon"><i class="fa-solid fa-id-card"></i></div>
-                        <div class="metric-label">Last RFID</div>
+                        <div class="metric-label">Last ID card</div>
                     </div>
                     <div class="metric-value" id="rfidValue">None</div>
-                    <div class="metric-note">Firebase: SmartSchoolBus/Attendance/LastRFID</div>
-                </article>
-            </div>
-
-            <div class="schema-note">
-                Dashboard paths are intentionally aligned with the ESP32 code:
-                <strong>/SmartSchoolBus/GPS</strong>,
-                <strong>/SmartSchoolBus/Sensors</strong>, and
-                <strong>/SmartSchoolBus/Attendance</strong>.
+                    </article>
             </div>
         </section>
 
