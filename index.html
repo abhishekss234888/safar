@@ -382,7 +382,7 @@
     <h1>WELCOME TO SAFAR!</h1>
     <h3 class="sub-tag">the jorney begins here!</h3>
 
-    <form id="loginForm" autocomplete="off">
+    <form id="loginForm" method="post" action="#" autocomplete="off" novalidate>
       <div class="field">
         <label for="username">Username</label>
         <div class="glass-input">
@@ -417,39 +417,61 @@
   </div>
 </div>
 <script>
-  // Show/hide password (independent of Firebase so it always works)
-  (function () {
-    var pwd = document.getElementById('password');
-    var toggle = document.getElementById('toggleVis');
-    // keep focus in the password field when pressing the eye button
-    toggle.addEventListener('mousedown', function (e) { e.preventDefault(); });
-    toggle.addEventListener('click', function () {
-      var show = pwd.type === 'password';
-      var pos = pwd.selectionStart;
-      pwd.type = show ? 'text' : 'password';
-      toggle.classList.toggle('is-visible', show);
-      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-      pwd.focus();
-      try { pwd.setSelectionRange(pos, pos); } catch (e) {}
-    });
-  })();
-</script>
-<script type="module">
-  // ============================================================
-  // 🔥 FIREBASE — ADD / CONFIRM YOUR CREDENTIALS HERE
-  // ============================================================
-  // Example account: user@safar.app
-  // ============================================================
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    setPersistence,
-    browserLocalPersistence
-  } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+(function () {
+  'use strict';
 
-  const firebaseConfig = {
+  // ---------- elements ----------
+  var form = document.getElementById('loginForm');
+  var btn = document.getElementById('loginBtn');
+  var usernameField = document.getElementById('username');
+  var passwordField = document.getElementById('password');
+  var toggle = document.getElementById('toggleVis');
+  var errorBox = document.getElementById('loginError');
+  var errorText = document.getElementById('loginErrorText');
+  var btnOriginal = btn.innerHTML;
+
+  // ---------- show / hide password ----------
+  toggle.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  toggle.addEventListener('click', function () {
+    var show = passwordField.type === 'password';
+    var pos = passwordField.selectionStart;
+    passwordField.type = show ? 'text' : 'password';
+    toggle.classList.toggle('is-visible', show);
+    toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    passwordField.focus();
+    try { passwordField.setSelectionRange(pos, pos); } catch (e) {}
+  });
+
+  // ---------- error helpers ----------
+  function showError(message) {
+    errorText.textContent = message;
+    errorBox.classList.add('show');
+    usernameField.closest('.field').classList.add('has-error');
+    passwordField.closest('.field').classList.add('has-error');
+  }
+  function clearError() {
+    errorBox.classList.remove('show');
+    usernameField.closest('.field').classList.remove('has-error');
+    passwordField.closest('.field').classList.remove('has-error');
+  }
+  function friendlyError(code) {
+    switch (code) {
+      case 'auth/invalid-email': return 'Enter a valid email address in the username field.';
+      case 'auth/user-not-found':
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password': return 'Incorrect username or password.';
+      case 'auth/too-many-requests': return 'Too many attempts. Please wait a moment and try again.';
+      case 'auth/network-request-failed': return 'Network error \u2014 check your connection and try again.';
+      case 'auth/operation-not-allowed': return 'Email/Password sign-in isn\u2019t enabled yet in Firebase Console.';
+      case 'auth/operation-not-supported-in-this-environment': return 'Open this page from http://localhost or your hosting URL, not as a local file.';
+      case 'auth/unauthorized-domain': return 'This domain is not authorized in Firebase Console (Authentication \u2192 Settings \u2192 Authorized domains).';
+      default: return 'Sign-in failed. Please try again.';
+    }
+  }
+
+  // ---------- Firebase (loaded safely so the page never breaks if it fails) ----------
+  var ADMIN_EMAIL = 'admin@safar.com';
+  var firebaseConfig = {
     apiKey: "AIzaSyAYmzDU0aAlRsnICNYvWFBgnrd2pb6EegA",
     authDomain: "safar456.firebaseapp.com",
     databaseURL: "https://safar456-default-rtdb.firebaseio.com",
@@ -459,96 +481,53 @@
     appId: "1:59056822262:web:98c1f9dfe5b36929d1d9d7",
     measurementId: "G-8P3202TJZ4"
   };
+  var BASE = "https://www.gstatic.com/firebasejs/12.17.1/";
+  var redirected = false;
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Role-based routing:
-  // admin@safar.com -> admin-dashboard.html
-  // every other authenticated Firebase user -> dashboard.html
-  const ADMIN_EMAIL = 'admin@safar.com';
-
-  // Single redirect path: only this listener navigates (guarded so it fires once)
-  let redirected = false;
-  onAuthStateChanged(auth, (user) => {
-    if (!user || redirected) return;
+  function goToDashboard(user) {
+    if (redirected) return;
     redirected = true;
-
-    const email = String(user.email || '').trim().toLowerCase();
-
-    if (email === ADMIN_EMAIL) {
-      window.location.replace('admin-dashboard.html');
-    } else {
-      window.location.replace('dashboard.html');
-    }
-  });
-
-  // ---------------- login submit ----------------
-  const form = document.getElementById('loginForm');
-  const btn = document.getElementById('loginBtn');
-  const usernameField = document.getElementById('username');
-  const passwordField = document.getElementById('password');
-  const errorBox = document.getElementById('loginError');
-  const errorText = document.getElementById('loginErrorText');
-  const btnOriginal = btn.innerHTML;
-
-  function showError(message) {
-    errorText.textContent = message;
-    errorBox.classList.add('show');
-    usernameField.closest('.field').classList.add('has-error');
-    passwordField.closest('.field').classList.add('has-error');
+    var email = String(user.email || '').trim().toLowerCase();
+    window.location.replace(email === ADMIN_EMAIL ? 'admin-dashboard.html' : 'dashboard.html');
   }
 
-  function clearError() {
-    errorBox.classList.remove('show');
-    usernameField.closest('.field').classList.remove('has-error');
-    passwordField.closest('.field').classList.remove('has-error');
-  }
+  var fbReady = (async function () {
+    var appMod = await import(BASE + "firebase-app.js");
+    var authMod = await import(BASE + "firebase-auth.js");
+    var app = appMod.initializeApp(firebaseConfig);
+    var auth = authMod.getAuth(app);
+    // the ONLY place that redirects
+    authMod.onAuthStateChanged(auth, function (user) { if (user) goToDashboard(user); });
+    return { auth: auth, mod: authMod };
+  })();
+  fbReady.catch(function (err) { console.error('Firebase failed to load:', err); });
 
-  function friendlyError(code) {
-    switch (code) {
-      case 'auth/invalid-email':
-        return 'Enter a valid email address in the username field.';
-      case 'auth/user-not-found':
-      case 'auth/invalid-credential':
-      case 'auth/wrong-password':
-        return 'Incorrect username or password.';
-      case 'auth/too-many-requests':
-        return 'Too many attempts. Please wait a moment and try again.';
-      case 'auth/network-request-failed':
-        return 'Network error — check your connection and try again.';
-      case 'auth/operation-not-allowed':
-        return 'Email/Password sign-in isn\u2019t enabled yet in Firebase Console.';
-      default:
-        return 'Sign-in failed. Please try again.';
-    }
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // ---------- login submit ----------
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();               // never let credentials go into the URL
     clearError();
 
-    const email = usernameField.value.trim();
-    const password = passwordField.value;
-    if (!email || !password) {
-      showError('Please fill in both fields.');
-      return;
-    }
+    var email = usernameField.value.trim();
+    var password = passwordField.value;
+    if (!email || !password) { showError('Please fill in both fields.'); return; }
 
     btn.disabled = true;
-    btn.innerHTML = 'Signing in…';
+    btn.innerHTML = 'Signing in\u2026';
 
     try {
-      await setPersistence(auth, browserLocalPersistence);
-      await signInWithEmailAndPassword(auth, email, password);
-      btn.innerHTML = 'Success — redirecting…';
-      // onAuthStateChanged above handles the redirect
+      var fb = await fbReady;
+      await fb.mod.setPersistence(fb.auth, fb.mod.browserLocalPersistence);
+      await fb.mod.signInWithEmailAndPassword(fb.auth, email, password);
+      btn.innerHTML = 'Success \u2014 redirecting\u2026';   // onAuthStateChanged redirects
     } catch (err) {
-      showError(friendlyError(err.code));
+      console.error(err);
+      showError(err && err.code ? friendlyError(err.code)
+        : 'Could not load Firebase. Check your internet connection and open the page via http://localhost or your hosting URL.');
       btn.disabled = false;
       btn.innerHTML = btnOriginal;
     }
   });
+})();
 </script>
 
 </body>
