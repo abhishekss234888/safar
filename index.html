@@ -211,7 +211,13 @@
 </style>
 </head>
 <body>
-
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js');
+  });
+}
+</script>
 <div class="bg-layer" aria-hidden="true">
   <div class="bg-photo"></div>
   <div class="bg-orb o1"></div>
