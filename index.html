@@ -167,14 +167,6 @@
       rgba(190,140,255,0.4) 75%,
       rgba(255,255,255,0.65));
     box-shadow:0 30px 80px -24px rgba(0,0,0,0.5);
-    animation:float 4s cubic-bezier(0.45,0,0.55,1) infinite;
-    will-change:transform;
-    transform:translateZ(0);
-    backface-visibility:hidden;
-  }
-  @keyframes float{
-    0%,100%{ transform:translate3d(0,0,0); }
-    50%{ transform:translate3d(0,-8px,0); }
   }
   .glass-card{
     width:100%;
@@ -193,30 +185,6 @@
     transform:translateZ(0);
     backface-visibility:hidden;
     overflow:hidden;
-  }
-  /* soft moving sheen across the glass */
-  .glass-card::before{
-    content:"";
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:200%;
-    height:200%;
-    background:linear-gradient(120deg, transparent 42%, rgba(255,255,255,0.08) 47%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.08) 53%, transparent 58%);
-    animation:sheen 5s cubic-bezier(0.45,0,0.55,1) infinite;
-    pointer-events:none;
-    will-change:transform;
-    transform:translate3d(-18%,-12%,0) rotate(8deg);
-    backface-visibility:hidden;
-  }
-  @keyframes sheen{
-    0%{ transform:translate3d(-18%,-12%,0) rotate(8deg); }
-    50%{ transform:translate3d(12%,10%,0) rotate(8deg); }
-    100%{ transform:translate3d(-18%,-12%,0) rotate(8deg); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .glass-card::before{animation:none;}
-    .glass-card-outer{animation:none;}
   }
 
   h1{
@@ -448,6 +416,24 @@
   </div>
   </div>
 </div>
+<script>
+  // Show/hide password (independent of Firebase so it always works)
+  (function () {
+    var pwd = document.getElementById('password');
+    var toggle = document.getElementById('toggleVis');
+    // keep focus in the password field when pressing the eye button
+    toggle.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    toggle.addEventListener('click', function () {
+      var show = pwd.type === 'password';
+      var pos = pwd.selectionStart;
+      pwd.type = show ? 'text' : 'password';
+      toggle.classList.toggle('is-visible', show);
+      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      pwd.focus();
+      try { pwd.setSelectionRange(pos, pos); } catch (e) {}
+    });
+  })();
+</script>
 <script type="module">
   // ============================================================
   // 🔥 FIREBASE — ADD / CONFIRM YOUR CREDENTIALS HERE
@@ -482,8 +468,11 @@
   // every other authenticated Firebase user -> dashboard.html
   const ADMIN_EMAIL = 'admin@safar.com';
 
+  // Single redirect path: only this listener navigates (guarded so it fires once)
+  let redirected = false;
   onAuthStateChanged(auth, (user) => {
-    if (!user) return;
+    if (!user || redirected) return;
+    redirected = true;
 
     const email = String(user.email || '').trim().toLowerCase();
 
@@ -492,16 +481,6 @@
     } else {
       window.location.replace('dashboard.html');
     }
-  });
-
-  // ---------------- password visibility toggle (unchanged) ----------------
-  const pwd = document.getElementById('password');
-  const toggle = document.getElementById('toggleVis');
-  toggle.addEventListener('click', () => {
-    const isPw = pwd.type === 'password';
-    pwd.type = isPw ? 'text' : 'password';
-    toggle.classList.toggle('is-visible', isPw);
-    toggle.setAttribute('aria-label', isPw ? 'Hide password' : 'Show password');
   });
 
   // ---------------- login submit ----------------
@@ -561,16 +540,9 @@
 
     try {
       await setPersistence(auth, browserLocalPersistence);
-      const credential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       btn.innerHTML = 'Success — redirecting…';
-
-      const signedInEmail = String(credential.user?.email || email).trim().toLowerCase();
-
-      if (signedInEmail === ADMIN_EMAIL) {
-        window.location.replace('admin-dashboard.html');
-      } else {
-        window.location.replace('dashboard.html');
-      }
+      // onAuthStateChanged above handles the redirect
     } catch (err) {
       showError(friendlyError(err.code));
       btn.disabled = false;
