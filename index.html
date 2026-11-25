@@ -481,8 +481,10 @@
     appId: "1:59056822262:web:98c1f9dfe5b36929d1d9d7",
     measurementId: "G-8P3202TJZ4"
   };
-  var BASE = "https://www.gstatic.com/firebasejs/12.17.1/";
+  // tries several SDK versions in case one isn't reachable from the host
+  var SDK_VERSIONS = ["12.17.1", "12.19.0", "11.10.0"];
   var redirected = false;
+  var loadError = '';
 
   function goToDashboard(user) {
     if (redirected) return;
@@ -492,13 +494,24 @@
   }
 
   var fbReady = (async function () {
-    var appMod = await import(BASE + "firebase-app.js");
-    var authMod = await import(BASE + "firebase-auth.js");
-    var app = appMod.initializeApp(firebaseConfig);
-    var auth = authMod.getAuth(app);
-    // the ONLY place that redirects
-    authMod.onAuthStateChanged(auth, function (user) { if (user) goToDashboard(user); });
-    return { auth: auth, mod: authMod };
+    var lastErr;
+    for (var i = 0; i < SDK_VERSIONS.length; i++) {
+      var base = "https://www.gstatic.com/firebasejs/" + SDK_VERSIONS[i] + "/";
+      try {
+        var appMod = await import(base + "firebase-app.js");
+        var authMod = await import(base + "firebase-auth.js");
+        var app = appMod.initializeApp(firebaseConfig);
+        var auth = authMod.getAuth(app);
+        // the ONLY place that redirects
+        authMod.onAuthStateChanged(auth, function (user) { if (user) goToDashboard(user); });
+        return { auth: auth, mod: authMod };
+      } catch (err) {
+        lastErr = err;
+        console.warn('Firebase ' + SDK_VERSIONS[i] + ' failed to load:', err);
+      }
+    }
+    loadError = String(lastErr && lastErr.message || lastErr || 'unknown error');
+    throw lastErr;
   })();
   fbReady.catch(function (err) { console.error('Firebase failed to load:', err); });
 
@@ -522,7 +535,7 @@
     } catch (err) {
       console.error(err);
       showError(err && err.code ? friendlyError(err.code)
-        : 'Could not load Firebase. Check your internet connection and open the page via http://localhost or your hosting URL.');
+        : 'Could not load Firebase (' + (loadError || (err && err.message) || 'unknown') + '). Disable ad blockers/VPN, check Vercel headers (CSP), then press F12 \u2192 Console for details.');
       btn.disabled = false;
       btn.innerHTML = btnOriginal;
     }
